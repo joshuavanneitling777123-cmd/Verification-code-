@@ -34,17 +34,25 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
 
+        .code-container {
+            position: relative;
+            margin: 30px 0;
+        }
+
         .code-display {
             font-size: 3rem;
             font-weight: bold;
             letter-spacing: 10px;
-            margin: 30px 0;
             height: 80px;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
             overflow: hidden;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            margin-bottom: 15px;
         }
 
         .character {
@@ -74,6 +82,7 @@
             transition: all 0.3s;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             outline: none;
+            margin: 5px;
         }
 
         .btn:hover {
@@ -83,6 +92,12 @@
 
         .btn:active {
             transform: translateY(1px);
+        }
+
+        .btn.copy-btn {
+            background: linear-gradient(45deg, #138808, #000080);
+            padding: 10px 25px;
+            font-size: 1rem;
         }
 
         .falling {
@@ -113,20 +128,55 @@
             color: #666;
             font-size: 0.9rem;
         }
+
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #138808;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .show-notification {
+            opacity: 1;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Verification Code Generator</h1>
-        <div class="code-display" id="codeDisplay"></div>
-        <button class="btn" id="generateBtn">Generate Code</button>
+        <h1>Verification Code</h1>
+        <div class="code-container">
+            <div class="code-display" id="codeDisplay"></div>
+            <div class="btn-container">
+                <button class="btn" id="generateBtn">Generate Code</button>
+                <button class="btn copy-btn" id="copyBtn">Copy Code</button>
+            </div>
+        </div>
         <div class="footer">Indian Flag Themed Verification System</div>
     </div>
+
+    <div class="copy-notification" id="copyNotification">Code copied to clipboard!</div>
 
     <script>
         const codeDisplay = document.getElementById('codeDisplay');
         const generateBtn = document.getElementById('generateBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyNotification = document.getElementById('copyNotification');
         let usedCodes = new Set();
+        let currentCode = '';
 
         function generateRandomLetter() {
             const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -151,6 +201,7 @@
             } while (usedCodes.has(code));
             
             usedCodes.add(code);
+            currentCode = code;
             return code;
         }
 
@@ -211,9 +262,17 @@
             }
         }
 
+        function showCopyNotification() {
+            copyNotification.classList.add('show-notification');
+            setTimeout(() => {
+                copyNotification.classList.remove('show-notification');
+            }, 2000);
+        }
+
         generateBtn.addEventListener('click', () => {
-            // Disable button during generation
+            // Disable buttons during generation
             generateBtn.disabled = true;
+            copyBtn.disabled = true;
             generateBtn.textContent = 'Generating...';
             
             // Generate and display code after a short delay
@@ -221,10 +280,30 @@
                 const code = generateUniqueCode();
                 displayCodeWithAnimation(code);
                 
-                // Re-enable button
+                // Re-enable buttons
                 generateBtn.disabled = false;
+                copyBtn.disabled = false;
                 generateBtn.textContent = 'Generate Code';
             }, 1000);
+        });
+
+        copyBtn.addEventListener('click', () => {
+            if (!currentCode) return;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(currentCode).then(() => {
+                showCopyNotification();
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = currentCode;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showCopyNotification();
+            });
         });
 
         // Generate initial code
