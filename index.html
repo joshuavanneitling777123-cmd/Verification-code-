@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Code Generator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        h1 {
+            color: #fff;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .code-display {
+            font-size: 42px;
+            letter-spacing: 8px;
+            margin: 30px 0;
+            padding: 20px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            font-weight: bold;
+            display: inline-block;
+            min-width: 250px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: pulse 2s infinite;
+        }
+        
+        .code-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0) 40%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 60%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                45deg,
+                transparent 10%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 90%
+            );
+            animation: buttonShine 3s infinite;
+        }
+        
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        button:disabled::after {
+            display: none;
+        }
+        
+        .status {
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+            font-size: 14px;
+        }
+        
+        .note {
+            margin-top: 30px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            20% { transform: translateX(100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+        
+        @keyframes buttonShine {
+            0% { transform: translateX(-100%); }
+            20% { transform: translateX(100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes codeGenerate {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .generating {
+            animation: codeGenerate 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Verification Code Generator</h1>
+        <div class="code-display" id="verificationCode">-----</div>
+        <div class="button-group">
+            <button id="generateButton">Generate Code</button>
+            <button id="copyButton">Copy Code</button>
+        </div>
+        <p class="status" id="status">Click "Generate Code" to create a new verification code</p>
+        <p class="note">Each code contains 2 English letters and 3 numbers in random order</p>
+    </div>
+
+    <script>
+        const verificationCodeElement = document.getElementById('verificationCode');
+        const generateButton = document.getElementById('generateButton');
+        const copyButton = document.getElementById('copyButton');
+        const statusElement = document.getElementById('status');
+        
+        let currentCode = '';
+        
+        function generateRandomLetter() {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            return alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+        }
+        
+        function generateRandomNumber() {
+            return Math.floor(Math.random() * 10).toString();
+        }
+        
+        function generateVerificationCode() {
+            // Generate 2 letters and 3 numbers
+            const letters = [generateRandomLetter(), generateRandomLetter()];
+            const numbers = [generateRandomNumber(), generateRandomNumber(), generateRandomNumber()];
+            
+            // Combine them and shuffle
+            const allChars = [...letters, ...numbers];
+            
+            // Shuffle the array
+            for (let i = allChars.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allChars[i], allChars[j]] = [allChars[j], allChars[i]];
+            }
+            
+            return allChars.join('');
+        }
+        
+        function updateCode() {
+            verificationCodeElement.classList.add('generating');
+            
+            // Remove the animation class after it completes
+            setTimeout(() => {
+                verificationCodeElement.classList.remove('generating');
+            }, 500);
+            
+            currentCode = generateVerificationCode();
+            verificationCodeElement.textContent = currentCode;
+            statusElement.textContent = `Code generated at ${new Date().toLocaleTimeString()}`;
+        }
+        
+        generateButton.addEventListener('click', () => {
+            updateCode();
+        });
+        
+        copyButton.addEventListener('click', () => {
+            if (!currentCode) {
+                statusElement.textContent = "Generate a code first!";
+                return;
+            }
+            
+            navigator.clipboard.writeText(currentCode).then(() => {
+                statusElement.textContent = "Code copied to clipboard!";
+                setTimeout(() => {
+                    statusElement.textContent = `Code generated at ${new Date().toLocaleTimeString()}`;
+                }, 2000);
+            }).catch(err => {
+                statusElement.textContent = "Failed to copy code";
+                console.error('Failed to copy code: ', err);
+            });
+        });
+        
+        // Generate first code on page load
+        window.addEventListener('load', () => {
+            setTimeout(updateCode, 300);
+        });
+    </script>
+</body>
+</html>
