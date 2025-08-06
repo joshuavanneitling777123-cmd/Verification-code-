@@ -3,265 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verification Code Generator</title>
+    <title>Indian Flag Verification Code Generator</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-        
         body {
-            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-        }
-        
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            max-width: 500px;
-            width: 90%;
-            animation: fadeIn 0.8s ease-out;
-        }
-        
-        h1 {
-            color: #fff;
-            margin-bottom: 30px;
-            font-weight: 600;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .code-display {
-            font-size: 42px;
-            letter-spacing: 8px;
-            margin: 30px 0;
-            padding: 20px 30px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            color: #fff;
-            font-weight: bold;
-            display: inline-block;
-            min-width: 250px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            position: relative;
+            background: url('https://upload.wikimedia.org/wikipedia/en/thumb/4/41/Flag_of_India.svg/1200px-Flag_of_India.svg.png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Arial', sans-serif;
             overflow: hidden;
-            animation: pulse 2s infinite;
         }
-        
-        .code-display::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0) 40%,
-                rgba(255, 255, 255, 0.3) 50%,
-                rgba(255, 255, 255, 0) 60%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            transform: rotate(30deg);
-            animation: shine 3s infinite;
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
         }
-        
-        .button-group {
+
+        h1 {
+            color: #FF9933;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .code-display {
+            font-size: 3rem;
+            font-weight: bold;
+            letter-spacing: 10px;
+            margin: 30px 0;
+            height: 80px;
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
         }
-        
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        .character {
+            display: inline-block;
+            position: relative;
+            color: #138808; /* Indian flag green */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .character.letter {
+            color: #FF9933; /* Indian flag orange */
+        }
+
+        .character.number {
+            color: #000080; /* Indian flag navy blue */
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #FF9933, #000080);
             color: white;
             border: none;
             padding: 12px 30px;
-            font-size: 16px;
+            font-size: 1.2rem;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
-            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            outline: none;
         }
-        
-        button:hover {
+
+        .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
-        
-        button:active {
+
+        .btn:active {
             transform: translateY(1px);
         }
-        
-        button::after {
-            content: '';
+
+        .falling {
+            animation: fall 0.5s ease-out forwards;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .confetti {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                45deg,
-                transparent 10%,
-                rgba(255, 255, 255, 0.3) 50%,
-                transparent 90%
-            );
-            animation: buttonShine 3s infinite;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
         }
-        
-        button:disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        button:disabled::after {
-            display: none;
-        }
-        
-        .status {
+
+        .footer {
             margin-top: 30px;
-            color: rgba(255, 255, 255, 0.8);
-            font-style: italic;
-            font-size: 14px;
-        }
-        
-        .note {
-            margin-top: 30px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes shine {
-            0% { transform: translateX(-100%) rotate(30deg); }
-            20% { transform: translateX(100%) rotate(30deg); }
-            100% { transform: translateX(100%) rotate(30deg); }
-        }
-        
-        @keyframes buttonShine {
-            0% { transform: translateX(-100%); }
-            20% { transform: translateX(100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        @keyframes codeGenerate {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        .generating {
-            animation: codeGenerate 0.5s ease-out;
+            color: #666;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Verification Code Generator</h1>
-        <div class="code-display" id="verificationCode">-----</div>
-        <div class="button-group">
-            <button id="generateButton">Generate Code</button>
-            <button id="copyButton">Copy Code</button>
-        </div>
-        <p class="status" id="status">Click "Generate Code" to create a new verification code</p>
-        <p class="note">Each code contains 2 English letters and 3 numbers in random order</p>
+        <div class="code-display" id="codeDisplay"></div>
+        <button class="btn" id="generateBtn">Generate Code</button>
+        <div class="footer">Indian Flag Themed Verification System</div>
     </div>
 
     <script>
-        const verificationCodeElement = document.getElementById('verificationCode');
-        const generateButton = document.getElementById('generateButton');
-        const copyButton = document.getElementById('copyButton');
-        const statusElement = document.getElementById('status');
-        
-        let currentCode = '';
-        
+        const codeDisplay = document.getElementById('codeDisplay');
+        const generateBtn = document.getElementById('generateBtn');
+        let usedCodes = new Set();
+
         function generateRandomLetter() {
             const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             return alphabet.charAt(Math.floor(Math.random() * alphabet.length));
         }
-        
+
         function generateRandomNumber() {
-            return Math.floor(Math.random() * 10).toString();
+            return Math.floor(Math.random() * 10);
         }
-        
-        function generateVerificationCode() {
-            // Generate 2 letters and 3 numbers
-            const letters = [generateRandomLetter(), generateRandomLetter()];
-            const numbers = [generateRandomNumber(), generateRandomNumber(), generateRandomNumber()];
+
+        function generateUniqueCode() {
+            let code;
+            do {
+                // Generate 2 letters and 3 numbers
+                const part1 = generateRandomLetter();
+                const part2 = generateRandomLetter();
+                const part3 = generateRandomNumber();
+                const part4 = generateRandomNumber();
+                const part5 = generateRandomNumber();
+                
+                code = `${part1}${part2}${part3}${part4}${part5}`;
+            } while (usedCodes.has(code));
             
-            // Combine them and shuffle
-            const allChars = [...letters, ...numbers];
-            
-            // Shuffle the array
-            for (let i = allChars.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [allChars[i], allChars[j]] = [allChars[j], allChars[i]];
-            }
-            
-            return allChars.join('');
+            usedCodes.add(code);
+            return code;
         }
-        
-        function updateCode() {
-            verificationCodeElement.classList.add('generating');
+
+        function displayCodeWithAnimation(code) {
+            // Clear previous code
+            codeDisplay.innerHTML = '';
             
-            // Remove the animation class after it completes
-            setTimeout(() => {
-                verificationCodeElement.classList.remove('generating');
-            }, 500);
+            // Split code into characters and create elements for each
+            const characters = code.split('');
             
-            currentCode = generateVerificationCode();
-            verificationCodeElement.textContent = currentCode;
-            statusElement.textContent = `Code generated at ${new Date().toLocaleTimeString()}`;
-        }
-        
-        generateButton.addEventListener('click', () => {
-            updateCode();
-        });
-        
-        copyButton.addEventListener('click', () => {
-            if (!currentCode) {
-                statusElement.textContent = "Generate a code first!";
-                return;
-            }
-            
-            navigator.clipboard.writeText(currentCode).then(() => {
-                statusElement.textContent = "Code copied to clipboard!";
+            characters.forEach((char, index) => {
+                const charElement = document.createElement('span');
+                charElement.textContent = char;
+                charElement.className = `character ${isNaN(char) ? 'letter' : 'number'}`;
+                charElement.style.animationDelay = `${index * 0.1}s`;
+                charElement.classList.add('falling');
+                
+                // Remove animation class after animation completes
                 setTimeout(() => {
-                    statusElement.textContent = `Code generated at ${new Date().toLocaleTimeString()}`;
-                }, 2000);
-            }).catch(err => {
-                statusElement.textContent = "Failed to copy code";
-                console.error('Failed to copy code: ', err);
+                    charElement.classList.remove('falling');
+                }, 500 + (index * 100));
+                
+                codeDisplay.appendChild(charElement);
             });
+            
+            // Create confetti effect
+            createConfetti();
+        }
+
+        function createConfetti() {
+            const colors = ['#FF9933', '#FFFFFF', '#138808', '#000080']; // Indian flag colors
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = `${Math.random() * 8 + 4}px`;
+                confetti.style.height = `${Math.random() * 8 + 4}px`;
+                confetti.style.borderRadius = '50%';
+                
+                document.body.appendChild(confetti);
+                
+                // Animate confetti
+                const animation = confetti.animate([
+                    { transform: 'translateY(-100px) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)',
+                    delay: Math.random() * 500
+                });
+                
+                // Remove confetti after animation
+                animation.onfinish = () => {
+                    confetti.remove();
+                };
+            }
+        }
+
+        generateBtn.addEventListener('click', () => {
+            // Disable button during generation
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+            
+            // Generate and display code after a short delay
+            setTimeout(() => {
+                const code = generateUniqueCode();
+                displayCodeWithAnimation(code);
+                
+                // Re-enable button
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate Code';
+            }, 1000);
         });
-        
-        // Generate first code on page load
-        window.addEventListener('load', () => {
-            setTimeout(updateCode, 300);
-        });
+
+        // Generate initial code
+        const initialCode = generateUniqueCode();
+        displayCodeWithAnimation(initialCode);
     </script>
 </body>
 </html>
